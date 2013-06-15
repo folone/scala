@@ -11,6 +11,7 @@ package scala
 package collection.immutable
 
 import scala.collection.parallel.immutable.ParRange
+import scala.collection.mutable.Builder
 
 /** The `Range` class represents integer values in range
  *  ''[start;end)'' with non-zero step value `step`.
@@ -45,10 +46,12 @@ import scala.collection.parallel.immutable.ParRange
 class Range(val start: Int, val end: Int, val step: Int)
 extends scala.collection.AbstractSeq[Int]
    with IndexedSeq[Int]
+   with scala.collection.IndexedSeqOptimized[Int, IndexedSeq[Int]]
    with scala.collection.CustomParallelizable[Int, ParRange]
    with Serializable
 {
   override def par = new ParRange(this)
+  override protected[this] def newBuilder: Builder[Int, IndexedSeq[Int]] = IndexedSeq.newBuilder[Int]
 
   private def gap           = end.toLong - start.toLong
   private def isExact       = gap % step == 0

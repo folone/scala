@@ -382,11 +382,11 @@ abstract class ClassfileParser {
 
     /** Throws an exception signaling a bad constant index. */
     private def errorBadIndex(index: Int) =
-      abort(s"bad constant pool index: $index at pos: ${in.bp}")
+      abort(s"bad constant pool index: $index at pos: ${in.bp} in $srcfile")
 
     /** Throws an exception signaling a bad tag at given address. */
     private def errorBadTag(start: Int) =
-      abort("bad constant pool tag ${in.buf(start)} at byte $start")
+      abort(s"bad constant pool tag ${in.buf(start)} at byte $start in $srcfile")
   }
 
   /** Try to force the chain of enclosing classes for the given name. Otherwise
