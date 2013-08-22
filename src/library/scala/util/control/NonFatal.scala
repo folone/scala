@@ -36,7 +36,7 @@ object NonFatal {
    def apply(t: Throwable): Boolean = t match {
      case _: StackOverflowError => true // StackOverflowError ok even though it is a VirtualMachineError
      // VirtualMachineError includes OutOfMemoryError and other fatal errors
-     case _: VirtualMachineError | _: ThreadDeath | _: InterruptedException | _: LinkageError | _: ControlThrowable => false
+     case _: VirtualMachineError | _: ThreadDeath | _: InterruptedException | _: LinkageError | _: ControlThrowable | _: NoSuchMethodException => false
      case _ => true
    }
   /**
