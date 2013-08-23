@@ -45,10 +45,33 @@ object TailCalls {
   /** This class represents a tailcalling computation
    */
   abstract class TailRec[+A] {
-    def map[B](f: A => B): TailRec[B] =
+
+    /** Continue the computation with `f`. */
+    final def map[B](f: A => B): TailRec[B] =
       flatMap(a => Call(() => Done(f(a))))
-    def flatMap[B](f: A => TailRec[B]): TailRec[B] =
-      Cont(this, f)
+
+    /** Continue the computation with `f` and merge the trampolining
+      * of this computation with that of `f`. */
+    final def flatMap[B](f: A => TailRec[B]): TailRec[B] =
+      this match {
+        case Done(a) => Call(() => f(a))
+        case c@Call(_) => Cont(c, f)
+        // Take advantage of the monad associative law to optimize the size of the required stack
+        case Cont(s, g) => Cont(s, (x:Any) => Cont(g(x), f))
+      }
+
+    /** Returns either the next step of the tailcalling computation,
+      * or the result if there are no more steps. */
+    final def resume: Either[() => TailRec[A], A] = this match {
+      case Done(a) => Right(a)
+      case Call(k) => Left(k)
+      case Cont(a, f) => a match {
+        case Done(v) => f(v).resume
+        case Call(k) => Left(() => Cont(k(), f))
+        case Cont(b, g) => b.flatMap(x => g(x) flatMap f).resume
+      }
+    }
+
     /** Returns the result of the tailcalling computation.
      */
     def result: A = {
