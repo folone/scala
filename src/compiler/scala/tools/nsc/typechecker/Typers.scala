@@ -1019,6 +1019,7 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
         if (mode.inPatternMode && isPopulatedPattern)
           return tree
 
+        // TODO (folone): ConstantType folding?
         val tree1 = constfold(tree, pt) // (10) (11)
         if (tree1.tpe <:< pt)
           return adapt(tree1, mode, pt, original)
@@ -3496,6 +3497,7 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
         ErroneousAnnotation
       }
 
+      // TODO (folone): ConstantType folding?
       /* Calling constfold right here is necessary because some trees (negated
        * floats and literals in particular) are not yet folded.
        */
@@ -3559,6 +3561,7 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
         case Typed(t, _) =>
           tree2ConstArg(t, pt)
 
+        // TODO (folone): ConstantType folding?
         case tree =>
           tryConst(tree, pt)
       }
