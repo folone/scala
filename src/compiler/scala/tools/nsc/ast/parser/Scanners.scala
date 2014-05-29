@@ -591,7 +591,7 @@ trait Scanners extends ScannersCommon {
 
     /** Can token end a statement? */
     def inLastOfStat(token: Token) = token match {
-      case CHARLIT | INTLIT | LONGLIT | FLOATLIT | DOUBLELIT | STRINGLIT | SYMBOLLIT |
+      case CHARLIT | BYTELIT | SHORTLIT | INTLIT | LONGLIT | FLOATLIT | DOUBLELIT | STRINGLIT | SYMBOLLIT |
            IDENTIFIER | BACKQUOTED_IDENT | THIS | NULL | TRUE | FALSE | RETURN | USCORE |
            TYPE | XMLSTART | RPAREN | RBRACKET | RBRACE =>
         true
@@ -1049,6 +1049,10 @@ trait Scanners extends ScannersCommon {
         "int(" + intVal + ")"
       case LONGLIT =>
         "long(" + intVal + ")"
+      case BYTELIT =>
+        "byte(" + intVal + ")"
+      case SHORTLIT =>
+        "short(" + intVal + ")"
       case FLOATLIT =>
         "float(" + floatVal + ")"
       case DOUBLELIT =>
@@ -1166,6 +1170,8 @@ trait Scanners extends ScannersCommon {
     case CHARLIT => "character literal"
     case INTLIT => "integer literal"
     case LONGLIT => "long literal"
+    case BYTELIT => "byte literal"
+    case SHORTLIT => "short literal"
     case FLOATLIT => "float literal"
     case DOUBLELIT => "double literal"
     case STRINGLIT | STRINGPART | INTERPOLATIONID => "string literal"
