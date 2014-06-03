@@ -634,6 +634,10 @@ trait Scanners extends ScannersCommon {
         putChar(ch)
         nextChar()
         getIdentOrOperatorRest()
+      case '\'' =>
+        putChar(ch)
+        nextChar()
+        getPrimeRest()
       case SU => // strangely enough, Character.isUnicodeIdentifierPart(SU) returns true!
         finishNamed()
       case _ =>
@@ -645,6 +649,13 @@ trait Scanners extends ScannersCommon {
           finishNamed()
         }
     }
+
+    private def getPrimeRest(): Unit =
+      if (ch == '\'') {
+        putChar(ch)
+        nextChar()
+        getPrimeRest()
+      } else finishNamed()
 
     private def getOperatorRest(): Unit = (ch: @switch) match {
       case '~' | '!' | '@' | '#' | '%' |
