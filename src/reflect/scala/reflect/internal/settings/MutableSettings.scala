@@ -58,6 +58,8 @@ abstract class MutableSettings extends AbsSettings {
   def maxClassfileName: IntSetting
 
   def isScala211: Boolean
+
+  def ZirrefutableGeneratorPatterns: BooleanSetting
 }
 
 object MutableSettings {

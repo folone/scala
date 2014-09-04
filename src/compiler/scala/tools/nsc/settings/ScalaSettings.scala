@@ -327,6 +327,11 @@ trait ScalaSettings extends AbsScalaSettings
 
   def YstatisticsEnabled = Ystatistics.value.nonEmpty
 
+  /**
+   * -Z Typelevel settings
+   */
+  val ZirrefutableGeneratorPatterns = BooleanSetting("-Zirrefutable-generator-patterns", "Treat patterns in for comprehensions as irrefutable. Do not add filter or withFilter calls.")
+
   /** Area-specific debug output.
    */
   val Ydocdebug               = BooleanSetting("-Ydoc-debug", "Trace all scaladoc activity.")
