@@ -131,8 +131,14 @@ trait MemberHandlers {
           if (replProps.vids) s"""" + f"@$${System.identityHashCode($path)}%8x" + """"
           else ""
 
-        val nameString = colorName(prettyName) + vidString
-        val typeString = colorType(req typeOf name)
+        import scala.io.AnsiColor.{ BOLD, BLUE, GREEN, RESET }
+
+        def boldColor(c: String, s: String) =
+          if (intp.colorsOk) string2code(BOLD) + string2code(c) + s + string2code(RESET)
+          else s
+
+        val nameString = boldColor(BLUE, string2code(prettyName)) + vidString
+        val typeString = boldColor(GREEN, string2code(req typeOf name))
         s""" + "$nameString: $typeString = " + $resultString"""
       }
     }

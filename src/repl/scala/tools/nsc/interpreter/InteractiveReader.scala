@@ -21,6 +21,7 @@ trait InteractiveReader {
   def history: History
   def completion: Completion
   def redrawLine(): Unit
+  def colorsOk: Boolean
 
   def readYesOrNo(prompt: String, alt: => Boolean): Boolean = readOneKey(prompt) match {
     case 'y'  => true

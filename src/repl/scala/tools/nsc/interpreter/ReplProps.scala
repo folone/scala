@@ -16,9 +16,6 @@ class ReplProps {
   private def bool(name: String) = BooleanProp.keyExists(name)
   private def int(name: String)  = Prop[Int](name)
 
-  // This property is used in TypeDebugging. Let's recycle it.
-  val colorOk = bool("scala.color")
-
   val info  = bool("scala.repl.info")
   val debug = bool("scala.repl.debug")
   val trace = bool("scala.repl.trace")
