@@ -5212,9 +5212,11 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
       }
 
       def typedSingletonTypeTree(tree: SingletonTypeTree) = {
+        // SIP-23: don't require AnyRef for 1.type etc
+        val pt = if (settings.Xexperimental) WildcardType else AnyRefTpe
         val refTyped =
           context.withImplicitsDisabled {
-            typed(tree.ref, MonoQualifierModes | mode.onlyTypePat, AnyRefTpe)
+            typed(tree.ref, MonoQualifierModes | mode.onlyTypePat, pt)
           }
 
         if (refTyped.isErrorTyped) {
