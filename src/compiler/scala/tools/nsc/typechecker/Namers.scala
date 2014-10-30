@@ -841,7 +841,7 @@ trait Namers extends MethodSynthesis {
     private def widenIfNecessary(sym: Symbol, tpe: Type, pt: Type): Type = {
       val getter =
         if (sym.isValue && sym.owner.isClass && sym.isPrivate)
-          sym.getter(sym.owner)
+          sym.getterIn(sym.owner)
         else sym
       def isHidden(tp: Type): Boolean = tp match {
         case SingleType(pre, sym) =>
@@ -853,6 +853,16 @@ trait Namers extends MethodSynthesis {
         case _ =>
           false
       }
+
+      // TODO: spec & clean this up -- this is a crucial part of type inference
+      // Some notes:
+      // - in principle, there's no need to widen the signature of a local stable definition
+      // - deconst only has effect on ConstantType *and its wrappers*, and for (tp: ConstantType), tp.deconst == tp.widen
+      // - dropIllegalStarTypes has no effect when tpe.typeSymbolDirect.isModuleClass
+      // - do we need to check tpe.deconst <:< pt?
+      // - for variables and non-accessor methods, we must widen the type
+      // - we should also widen to avoid mentioning hidden symbols in a singleton type
+
       val shouldWiden = (
            !tpe.typeSymbolDirect.isModuleClass // Infer Foo.type instead of "object Foo"
         && (tpe.widen <:< pt)                  // Don't widen our way out of conforming to pt
