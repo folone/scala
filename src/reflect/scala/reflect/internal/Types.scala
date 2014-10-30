@@ -2824,7 +2824,7 @@ trait Types
 
       // TODO: this assumes covariance.. we should look at bounds.lo for contravariance
       // can we plug this in where variance flipping is dealt with for us already?
-      def precludesWidening(tp: Type) = tp.isStable || tp.contains(SingletonClass)
+      def precludesWidening(tp: Type) = settings.Xexperimental && (tp.isStable || tp.contains(SingletonClass))
       if (precludesWidening(bounds.hi)) constr.stopWidening()
 
       constr
