@@ -825,7 +825,30 @@ trait Namers extends MethodSynthesis {
       }
     }
 
-    /** This method has a big impact on the eventual compiled code.
+    private def refersToSymbolLessAccessibleThan(tp: Type, sym: Symbol): Boolean = {
+      val accessibilityReference =
+        if (sym.isValue && sym.owner.isClass && sym.isPrivate)
+          sym.getterIn(sym.owner)
+        else sym
+
+      @tailrec def loop(tp: Type): Boolean = tp match {
+        case SingleType(pre, sym) =>
+          (sym isLessAccessibleThan accessibilityReference) || loop(pre)
+        case ThisType(sym) =>
+          sym isLessAccessibleThan accessibilityReference
+        case p: SimpleTypeProxy =>
+          loop(p.underlying)
+        case _ =>
+          false
+      }
+
+      loop(tp)
+    }
+
+//    private[this] val sip23 = settings.Xexperimental.value
+
+    /**
+     * This method has a big impact on the eventual compiled code.
      *  At this point many values have the most specific possible
      *  type (e.g. in val x = 42, x's type is Int(42), not Int) but
      *  most need to be widened to avoid undesirable propagation of
@@ -839,21 +862,6 @@ trait Namers extends MethodSynthesis {
      *  whether it is otherwise redundant (such as in a singleton.)
      */
     private def widenIfNecessary(sym: Symbol, tpe: Type, pt: Type): Type = {
-      val getter =
-        if (sym.isValue && sym.owner.isClass && sym.isPrivate)
-          sym.getterIn(sym.owner)
-        else sym
-      def isHidden(tp: Type): Boolean = tp match {
-        case SingleType(pre, sym) =>
-          (sym isLessAccessibleThan getter) || isHidden(pre)
-        case ThisType(sym) =>
-          sym isLessAccessibleThan getter
-        case p: SimpleTypeProxy =>
-          isHidden(p.underlying)
-        case _ =>
-          false
-      }
-
       // TODO: spec & clean this up -- this is a crucial part of type inference
       // Some notes:
       // - in principle, there's no need to widen the signature of a local stable definition
@@ -864,19 +872,42 @@ trait Namers extends MethodSynthesis {
       // - we should also widen to avoid mentioning hidden symbols in a singleton type
 
       val shouldWiden = (
-           !tpe.typeSymbolDirect.isModuleClass // Infer Foo.type instead of "object Foo"
-        && (tpe.widen <:< pt)                  // Don't widen our way out of conforming to pt
-        && (   sym.isVariable
-            || sym.isMethod && !sym.hasAccessorFlag
-            || isHidden(tpe)
-           )
-      )
-      dropIllegalStarTypes(
-        if (shouldWiden) tpe.widen
-        else if (sym.isFinal) tpe    // "final val" allowed to retain constant type
-        else tpe.deconst
-      )
+        sym.isVariable || sym.isMethod && !sym.hasAccessorFlag // unstable symbol
+        || refersToSymbolLessAccessibleThan(tpe, sym) // avoid hidden symbol in type
+        )
+
+      val widened =
+        if (true) {
+          if (tpe.typeSymbolDirect.isModuleClass) tpe // Infer Foo.type instead of "object Foo" -- TODO: do we need to call dropIllegalStarTypes on a type like this??
+          else if (shouldWiden) {
+            val tpWide = tpe.widen
+            // 99.99% of the time, pt will be WildcardType
+            if ((pt eq WildcardType) || (tpWide <:< pt)) tpWide // Don't widen our way out of conforming to pt
+            else tpe
+          } else {
+            if (sym.isFinal) tpe // "final val" allowed to retain constant type
+            else {
+              val de = tpe.deconst
+              val w = tpe.widen
+              val symInPublicInterface = !(sym.hasFlag(PRIVATE) || sym.isLocalToBlock)
+              val res =
+                if (de.isInstanceOf[LiteralType]) de.widen
+                else de
+              if (! (de =:= w)) println(s"deconst: $de <> widen: $w (${de.isInstanceOf[LiteralType]} && $symInPublicInterface) --> $res")
+              w
+            }
+          }
+        } else {
+          if (!tpe.typeSymbolDirect.isModuleClass // Infer Foo.type instead of "object Foo"
+            && (tpe.widen <:< pt) // Don't widen our way out of conforming to pt
+            && shouldWiden) tpe.widen
+          else if (sym.isFinal) tpe // "final val" allowed to retain constant type
+          else tpe.deconst
+        }
+
+      dropIllegalStarTypes(widened)
     }
+
     /** Computes the type of the body in a ValDef or DefDef, and
      *  assigns the type to the tpt's node.  Returns the type.
      */
