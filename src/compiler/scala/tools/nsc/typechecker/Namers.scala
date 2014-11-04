@@ -849,8 +849,6 @@ trait Namers extends MethodSynthesis {
       loop(tp)
     }
 
-//    private[this] val sip23 = settings.Xexperimental.value
-
     /**
      * This method has a big impact on the eventual compiled code.
      *  At this point many values have the most specific possible
@@ -866,7 +864,7 @@ trait Namers extends MethodSynthesis {
      *  whether it is otherwise redundant (such as in a singleton.)
      */
     private def widenIfNecessary(sym: Symbol, tpe: Type, pt: Type): Type =
-      if (settings.Xexperimental) { // SIP-23
+      if (sip23) { // SIP-23
         // TODO: spec -- this is a crucial part of type inference
         // NOTES:
         //  - Can we widen less? (E.g., for local definitions.)
