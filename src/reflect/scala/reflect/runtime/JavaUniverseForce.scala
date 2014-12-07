@@ -304,6 +304,7 @@ trait JavaUniverseForce { self: runtime.JavaUniverse  =>
     definitions.WhiteboxContextClass
     definitions.MacroImplAnnotation
     definitions.StringContextClass
+    definitions.SingleInhabitantModule
     definitions.QuasiquoteClass
     definitions.QuasiquoteClass_api
     definitions.QuasiquoteClass_api_apply
