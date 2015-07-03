@@ -1499,6 +1499,7 @@ trait Definitions extends api.StandardDefinitions {
       lazy val ReflectiveCallsFeature     = getLanguageFeature("reflectiveCalls")
 
       lazy val ApiUniverseReify = ApiUniverseClass.map(sym => getMemberMethod(sym, nme.reify))
+      lazy val ExistentialsFeature        = getLanguageFeature("existentials")
 
       lazy val ReflectRuntimeUniverse      = DefinitionsClass.this.ReflectRuntimeUniverse
       lazy val ReflectRuntimeCurrentMirror = DefinitionsClass.this.ReflectRuntimeCurrentMirror

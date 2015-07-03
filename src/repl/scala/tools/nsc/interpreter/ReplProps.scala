@@ -18,6 +18,7 @@ class ReplProps {
 
   val info  = bool("scala.repl.info")
   val debug = bool("scala.repl.debug")
+  val colorOk = bool("scala.color")
   val trace = bool("scala.repl.trace")
   val power = bool("scala.repl.power")
 

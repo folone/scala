@@ -25,6 +25,7 @@ import scala.tools.nsc.interpreter.session.History
  * Eagerly instantiates all relevant JLine classes, so that we can detect linkage errors on `new JLineReader` and retry.
  */
 class InteractiveReader(completer: () => Completion) extends interpreter.InteractiveReader {
+  val colorsOk = true
   val interactive = true
 
   val history: History = new JLineHistory.JLineFileHistory()

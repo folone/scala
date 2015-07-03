@@ -27,6 +27,7 @@ import ExecutionContext.Implicits._
 import java.io.{ BufferedReader, FileReader }
 
 import scala.util.{Try, Success, Failure}
+import scala.io.AnsiColor.{ MAGENTA, RESET }
 
 /** The Scala interactive shell.  It provides a read-eval-print loop
  *  around the Interpreter class.
@@ -901,10 +902,7 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
       asyncMessage(power.banner)
     }
     // SI-7418 Now, and only now, can we enable TAB completion.
-    in match {
-      case x: JLineReader => x.consoleReader.postInit
-      case _              =>
-    }
+    in.postInit()
     intp.colorsOk = in.colorsOk
   }
 
