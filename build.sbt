@@ -237,7 +237,7 @@ lazy val repl = configureAsSubproject(project)
     libraryDependencies += jlineDep,
     connectInput in run := true,
     outputStrategy in run := Some(StdoutOutput),
-    run <<= (run in Compile).partialInput(" -usejavacp") // Automatically add this so that `repl/run` works without additional arguments.
+    run <<= (run in Compile).partialInput(" -usejavacp -Xexperimental") // Automatically add this so that `repl/run` works without additional arguments.
   )
   .dependsOn(compiler)
 
